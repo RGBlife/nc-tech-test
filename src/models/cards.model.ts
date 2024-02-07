@@ -1,6 +1,7 @@
 import { readFile } from "fs/promises";
 import { fetchImageUrlById } from "./templates.model";
 import { formatSizes } from "../utils/formatSizes";
+import { EndpointError, ErrorType } from "../middleware/errors";
 
 type Card = {
   id: string;
@@ -65,5 +66,5 @@ export const fetchCardById = async (id: string): Promise<CardByIdResponse> => {
       pages: found.pages,
     };
   }
-  throw { message: `Card ${id} not found.`, status: 404 };
+  throw new EndpointError(`Card ${id} not found.`, ErrorType.NotFound);
 };

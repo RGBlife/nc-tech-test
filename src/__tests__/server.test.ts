@@ -42,4 +42,13 @@ describe("GET /cards/cardId", () => {
       })
     );
   });
+  test("returns 404 for non existent card ID", async () => {
+    const response = await request(app).get("/cards/invalidID").expect(404);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        error: expect.any(String),
+      })
+    );
+  });
 });
