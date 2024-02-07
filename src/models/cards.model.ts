@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import { fetchImageUrlById } from "./templates.model";
 import { formatSizes } from "../utils/formatSizes";
 import { EndpointError, ErrorType } from "../middleware/errors";
@@ -36,6 +36,13 @@ export type AvailableSize = {
   title: string;
 };
 
+type CardPostRequest = {
+  title: string;
+  sizes: string[];
+  basePrice: number;
+  pages: CardPage[];
+};
+
 const readCards = async () => {
   return JSON.parse(
     await readFile(`${__dirname}/../data/cards.json`, "utf8")
@@ -67,4 +74,25 @@ export const fetchCardById = async (id: string): Promise<CardByIdResponse> => {
     };
   }
   throw new EndpointError(`Card ${id} not found.`, ErrorType.NotFound);
+};
+
+export const insertCard = async (resCard: CardPostRequest): Promise<CardByIdResponse> => {
+  const cards = await readCards();
+
+  const newIdNumber = String(Number(cards[cards.length - 1].id.substring(4)) + 1).padStart(
+    3,
+    "0"
+  );
+
+  const newCard = {
+    title: resCard.title,
+    imageUrl: fetchImageUrlById(resCard.pages[0].templateId),
+    card_id: "card" + newIdNumber,
+    base_price: resCard.basePrice,
+    available_sizes: formatSizes(resCard.sizes),
+    pages: resCard.pages,
+  };
+  cards.push({ id: "card" + newIdNumber, ...resCard });
+  await writeFile(`${__dirname}/../data/cards.json`, JSON.stringify(cards, null, 2));
+  return newCard;
 };
