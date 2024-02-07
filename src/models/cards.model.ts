@@ -61,7 +61,7 @@ export const fetchCards = async (): Promise<CardResponse[]> => {
 };
 
 export const fetchCardById = async (id: string): Promise<CardByIdResponse> => {
-  const cards = await readCards();
+  const cards = await readCards();  
   const found = cards.find((card) => card.id === id);
   if (found) {
     return {
@@ -96,3 +96,10 @@ export const insertCard = async (resCard: CardPostRequest): Promise<CardByIdResp
   await writeFile(`${__dirname}/../data/cards.json`, JSON.stringify(cards, null, 2));
   return newCard;
 };
+
+export const removeCardById = async (id: string) => {
+    const cards = await readCards();
+    const cardRemoved = cards.filter((card) => card.id !== id);
+    await writeFile(`${__dirname}/../data/cards.json`, JSON.stringify(cardRemoved, null, 2));
+    return;
+  };

@@ -12,6 +12,30 @@ type Posted = {
   }[];
 };
 
+const posted: Posted = {
+  title: "example title",
+  sizes: ["sm", "md", "gt"],
+  basePrice: 200,
+  pages: [
+    {
+      title: "Front Cover",
+      templateId: "template001",
+    },
+    {
+      title: "Inside Left",
+      templateId: "template002",
+    },
+    {
+      title: "Inside Right",
+      templateId: "template003",
+    },
+    {
+      title: "Back Cover",
+      templateId: "template004",
+    },
+  ],
+};
+
 let initialCards: string;
 
 const fetchCards = async () => {
@@ -77,29 +101,6 @@ describe("GET /cards/cardId", () => {
 });
 
 describe("POST /cards", () => {
-  const posted: Posted = {
-    title: "example title",
-    sizes: ["sm", "md", "gt"],
-    basePrice: 200,
-    pages: [
-      {
-        title: "Front Cover",
-        templateId: "template001",
-      },
-      {
-        title: "Inside Left",
-        templateId: "template002",
-      },
-      {
-        title: "Inside Right",
-        templateId: "template003",
-      },
-      {
-        title: "Back Cover",
-        templateId: "template004",
-      },
-    ],
-  };
 
   test("returns 201 status and inserted card should match object structure with an card ID", async () => {
     const response = await request(app).post("/cards").send(posted).expect(201);
@@ -140,5 +141,15 @@ describe("POST /cards", () => {
         error: "Invalid request body",
       })
     );
+  });
+});
+
+describe("DELETE /cards/:cardId", () => {
+  test("returns 204 status for succesfully deleting the card", async () => {
+    const response = await request(app).post("/cards").send(posted).expect(201);    
+    await request(app).delete("/cards/card004").expect(204);
+  });
+  test("returns 404 status if the card id doesn't exist", async () => {
+    await request(app).delete("/cards/invalid").expect(404);
   });
 });
