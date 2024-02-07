@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { fetchCardById, fetchCards, insertCard } from "../models/cards.model";
+import { fetchCardById, fetchCards, insertCard, removeCardById } from "../models/cards.model";
 import { EndpointError, ErrorType } from "../middleware/errors";
 
 export const getCards = async (
@@ -49,6 +49,22 @@ export const postCard = async (
 
     const result = await insertCard(req.body);
     res.status(201).send(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteCardById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {    
+    const { cardId } = req.params;
+    
+    await fetchCardById(cardId);
+    await removeCardById(cardId);
+    res.status(204).send();
   } catch (err) {
     next(err);
   }
