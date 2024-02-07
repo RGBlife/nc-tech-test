@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFile } from "fs/promises";
 import { fetchImageUrlById } from "./templates.model";
 import { formatSizes } from "../utils/formatSizes";
 
@@ -35,11 +35,14 @@ export type AvailableSize = {
   title: string;
 };
 
-const cards = JSON.parse(
-  readFileSync(`${__dirname}/../data/cards.json`, "utf8")
-) as Card[];
+const readCards = async () => {
+  return JSON.parse(
+    await readFile(`${__dirname}/../data/cards.json`, "utf8")
+  ) as Card[];
+};
 
 export const fetchCards = async (): Promise<CardResponse[]> => {
+  const cards = await readCards();
   return cards.map((card) => {
     return {
       title: card.title,
@@ -50,6 +53,7 @@ export const fetchCards = async (): Promise<CardResponse[]> => {
 };
 
 export const fetchCardById = async (id: string): Promise<CardByIdResponse> => {
+  const cards = await readCards();
   const found = cards.find((card) => card.id === id);
   if (found) {
     return {
@@ -61,5 +65,5 @@ export const fetchCardById = async (id: string): Promise<CardByIdResponse> => {
       pages: found.pages,
     };
   }
-    throw { message: `Card ${id} not found.`, status: 404 };
+  throw { message: `Card ${id} not found.`, status: 404 };
 };

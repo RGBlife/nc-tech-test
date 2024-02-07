@@ -1,2 +1,3 @@
 # Notes
 - Sizes.json file is a duplicate of card.json, assumption is that I was meant to use sizes.json to map the sizes to the cards.json file, sizes.json file has been ignored for now.
+- Initially used readFileSync, a synchronous method as to store all the changes in memory as I will need to only read the JSON file once, the drawback is that all the data is lost if the server is shutdown/restarted. Changed my mind and changed to the non-blocking asynchronous method.
