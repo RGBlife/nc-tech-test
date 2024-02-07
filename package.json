@@ -26,5 +26,6 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "test": "jest --watch"
+    
   }
 }

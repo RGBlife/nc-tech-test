@@ -1,21 +1,55 @@
 import { Request, Response, NextFunction } from "express";
-import { fetchCardById, fetchCards } from "../models/cards.model";
+import { fetchCardById, fetchCards, insertCard } from "../models/cards.model";
+import { EndpointError, ErrorType } from "../middleware/errors";
 
-export const getCards = async (req: Request, res: Response, next: NextFunction) => {
+export const getCards = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const cards = await fetchCards();
     res.status(200).send(cards);
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
-export const getCardById = async (req: Request, res: Response, next: NextFunction) => {
+export const getCardById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { cardId } = req.params;
     const card = await fetchCardById(cardId);
     res.status(200).send(card);
   } catch (err) {
-    next(err)
+    next(err);
+  }
+};
+
+export const postCard = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { title, sizes, basePrice, pages } = req.body;
+
+    if (
+      !title ||
+      !sizes ||
+      !basePrice ||
+      !pages ||
+      Object.entries(req.body).length > 4
+    ) {
+      throw new EndpointError("Invalid request body", ErrorType.BadRequest);
+    }
+
+    const result = await insertCard(req.body);
+    res.status(201).send(result);
+  } catch (err) {
+    next(err);
   }
 };
